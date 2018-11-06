@@ -6,7 +6,7 @@ import java.awt.datatransfer.*;
 import java.io.IOException;
 
 /**
- * Created by 16734975 on 06.11.2018.
+ * Created by Shelkopryad on 06.11.2018.
  */
 public class ClipboardWorker implements ClipboardOwner {
 

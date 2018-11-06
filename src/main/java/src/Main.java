@@ -1,7 +1,7 @@
 package src;
 
 /**
- * Created by 16734975 on 06.11.2018.
+ * Created by Shelkopryad on 06.11.2018.
  */
 public class Main {
 

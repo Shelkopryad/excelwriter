@@ -16,23 +16,29 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Created by 16734975 on 06.11.2018.
+ * Created by Shelkopryad on 06.11.2018.
  */
 public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
-    private JButton copy;
+    private List<String> content = new ArrayList<>();
+    int globalIndex = 0;
 
     public ButtonFrame() {
         super();
         GlobalScreen.setEventDispatcher(new SwingDispatchService());
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
         constuctGUI();
         worker = new ClipboardWorker();
+
     }
 
     private void constuctGUI() {
@@ -47,10 +53,6 @@ public class ButtonFrame extends JFrame {
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
         JPanel panel = new JPanel();
-        copy = new JButton("Copy");
-        copy.setEnabled(false);
-        copy.addActionListener(new Handler());
-        panel.add(copy);
 
         JButton getFileChooser = new JButton("Choose file");
         getFileChooser.addActionListener(new FileChooserListener());
@@ -71,39 +73,34 @@ public class ButtonFrame extends JFrame {
         @Override
         public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
             System.out.println("Key Released: " + NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode()));
-            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_SPACE) {
-                JOptionPane.showMessageDialog(null, "This will run on Swing's Event Dispatch Thread.");
+            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
+                content.add(globalIndex, worker.getClipboardContents());
+                System.out.println(content.get(globalIndex));
+                if (globalIndex == 1) {
+                    try {
+                        writeFile(content);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                globalIndex = globalIndex == 0 ? 1 : 0;
             }
         }
 
     }
 
-    private class Handler implements ActionListener {
-        public void actionPerformed(ActionEvent actionEvent) {
-            String content = worker.getClipboardContents();
-
-//            try {
-//                writeFile(Arrays.asList(content));
-//            } catch (Exception e) {
-//                JOptionPane.showMessageDialog(null, "Какая-то ошибка");
-//            }
-
-            System.out.println(worker.getClipboardContents());
-        }
-
-        private void writeFile(List<String> newRow) throws IOException {
-            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-                Workbook workbook = new XSSFWorkbook(bis);
-                Sheet sheet = workbook.getSheetAt(0);
-                int rowCount = sheet.getPhysicalNumberOfRows();
-                Row row = sheet.createRow(rowCount + 1);
-                Cell name = row.createCell(1);
-                name.setCellValue(newRow.get(0));
-                Cell uri = row.createCell(8);
-                uri.setCellValue(newRow.get(1));
-                try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
-                    workbook.write(fio);
-                }
+    private void writeFile(List<String> newRow) throws IOException {
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+            Workbook workbook = new XSSFWorkbook(bis);
+            Sheet sheet = workbook.getSheetAt(0);
+            int rowCount = sheet.getPhysicalNumberOfRows();
+            Row row = sheet.createRow(rowCount + 1);
+            Cell name = row.createCell(1);
+            name.setCellValue(newRow.get(0));
+            Cell uri = row.createCell(8);
+            uri.setCellValue(newRow.get(1));
+            try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
+                workbook.write(fio);
             }
         }
     }
@@ -114,7 +111,6 @@ public class ButtonFrame extends JFrame {
             int ret = chooser.showDialog(null, "Открыть файл");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
-                copy.setEnabled(true);
             }
         }
     }
