@@ -55,11 +55,14 @@ public class ButtonFrame extends JFrame {
         name = new JTextField(20);
         uri = new JTextField(35);
 
+        JButton save = new JButton("Write");
+        save.addActionListener(new CopyListener());
         JButton getFileChooser = new JButton("Choose file");
         getFileChooser.addActionListener(new FileChooserListener());
 
         add(name);
         add(uri);
+        add(save);
         add(getFileChooser);
 
         setVisible(true);
@@ -80,15 +83,6 @@ public class ButtonFrame extends JFrame {
             if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
                 String content = worker.getClipboardContents();
                 setText(content);
-                if (nameIsPresent && uriIsPresent) {
-                    try {
-                        writeFile();
-                    } catch (IOException e) {
-                        JOptionPane.showMessageDialog(null, "Ошибочка");
-                    }
-                    nameIsPresent = false;
-                    uriIsPresent = false;
-                }
             }
         }
     }
@@ -108,7 +102,7 @@ public class ButtonFrame extends JFrame {
             Workbook workbook = new XSSFWorkbook(bis);
             Sheet sheet = workbook.getSheetAt(0);
             int rowCount = sheet.getPhysicalNumberOfRows();
-            Row row = sheet.createRow(rowCount + 1);
+            Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
             nameCell.setCellValue(name.getText());
             Cell uriCell = row.createCell(8);
@@ -116,6 +110,22 @@ public class ButtonFrame extends JFrame {
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Не выбран файл!");
+        }
+    }
+
+    private class CopyListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            try {
+                writeFile();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Какая-то ошибка.!");
+            }
+            nameIsPresent = false;
+            uriIsPresent = false;
         }
     }
 
