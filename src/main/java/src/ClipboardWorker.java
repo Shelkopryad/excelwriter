@@ -21,7 +21,6 @@ public class ClipboardWorker implements ClipboardOwner {
      * empty String.
      */
     public String getClipboardContents() {
-        JOptionPane errorFrame = new JOptionPane();
         String result = "";
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable contents = clipboard.getContents(null);
@@ -33,9 +32,9 @@ public class ClipboardWorker implements ClipboardOwner {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException ex){
-                errorFrame.setMessage(ex);
+                JOptionPane.showMessageDialog(null, ex);
             } catch (IOException ex) {
-                errorFrame.setMessage(ex);
+                JOptionPane.showMessageDialog(null, ex);
             }
         }
         return result;

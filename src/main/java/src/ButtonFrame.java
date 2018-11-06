@@ -1,15 +1,17 @@
 package src;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by 16734975 on 06.11.2018.
@@ -18,6 +20,7 @@ public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
+    private JButton copy;
 
     public ButtonFrame() {
         super("Personal Jesus");
@@ -26,15 +29,17 @@ public class ButtonFrame extends JFrame {
     }
 
     private void constuctGUI() {
+        setSize(200, 110);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
         JPanel panel = new JPanel();
-        JButton button = new JButton("Copy");
-        button.addActionListener(new Handler());
-        panel.add(button);
+        copy = new JButton("Copy");
+        copy.setEnabled(false);
+        copy.addActionListener(new Handler());
+        panel.add(copy);
 
-        JButton getFileChooser = new JButton("Показать JFileChooser");
+        JButton getFileChooser = new JButton("Choose file");
         getFileChooser.addActionListener(new FileChooserListener());
         panel.add(getFileChooser);
         getContentPane().add(panel);
@@ -46,42 +51,30 @@ public class ButtonFrame extends JFrame {
         public void actionPerformed(ActionEvent actionEvent) {
             String content = worker.getClipboardContents();
 
+            try {
+                writeFile(Arrays.asList(content));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Какая-то ошибка");
+            }
 
-//            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-//
-//            XSSFSheet sheet = workbook.getSheetAt(0);
-//
-//            Iterator<Row> rowIterator = sheet.iterator();
-//
-//            Iterator<Cell> cellIterator = row.cellIterator();
-
-
-
-//            try (FileWriter writer = new FileWriter(file, true)) {
-//                writer.append(content + "\n");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
             System.out.println(worker.getClipboardContents());
         }
 
-        private void writeFile() throws IOException {
-            FileInputStream fis;
-
-            if (file != null) {
-                fis = new FileInputStream(file);
-            } else {
-                JFileChooser chooser = new JFileChooser();
-                int ret = chooser.showDialog(null, "Открыть файл");
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                    file = chooser.getSelectedFile();
+        private void writeFile(List<String> newRow) throws IOException {
+            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+                Workbook workbook = new XSSFWorkbook(bis);
+                Sheet sheet = workbook.getSheetAt(0);
+                int rowCount = sheet.getPhysicalNumberOfRows();
+                Row row = sheet.createRow(rowCount + 1);
+                for (int cellIndex = 0; cellIndex < newRow.size(); cellIndex++) {
+                    Cell cell = row.createCell(cellIndex);
+                    cell.setCellValue(newRow.get(cellIndex));
                 }
-                fis = new FileInputStream(file);
-            }
 
-            HSSFWorkbook workbook = new HSSFWorkbook(fis);
-            HSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
+                try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
+                    workbook.write(fio);
+                }
+            }
         }
     }
 
@@ -91,6 +84,7 @@ public class ButtonFrame extends JFrame {
             int ret = chooser.showDialog(null, "Открыть файл");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
+                copy.setEnabled(true);
             }
         }
     }
