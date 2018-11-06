@@ -5,8 +5,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.dispatcher.SwingDispatchService;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -23,13 +29,20 @@ public class ButtonFrame extends JFrame {
     private JButton copy;
 
     public ButtonFrame() {
-        super("Personal Jesus");
+        super();
+        GlobalScreen.setEventDispatcher(new SwingDispatchService());
         constuctGUI();
         worker = new ClipboardWorker();
     }
 
     private void constuctGUI() {
-        setSize(200, 110);
+        try {
+            GlobalScreen.registerNativeHook();
+        } catch (NativeHookException e) {
+            e.printStackTrace();
+        }
+        GlobalScreen.addNativeKeyListener(new KeyListener());
+        setMinimumSize(new Dimension(200, 75));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
@@ -47,15 +60,33 @@ public class ButtonFrame extends JFrame {
         setVisible(true);
     }
 
+    private class KeyListener implements NativeKeyListener {
+
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {}
+
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {}
+
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
+            System.out.println("Key Released: " + NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode()));
+            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_SPACE) {
+                JOptionPane.showMessageDialog(null, "This will run on Swing's Event Dispatch Thread.");
+            }
+        }
+
+    }
+
     private class Handler implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             String content = worker.getClipboardContents();
 
-            try {
-                writeFile(Arrays.asList(content));
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Какая-то ошибка");
-            }
+//            try {
+//                writeFile(Arrays.asList(content));
+//            } catch (Exception e) {
+//                JOptionPane.showMessageDialog(null, "Какая-то ошибка");
+//            }
 
             System.out.println(worker.getClipboardContents());
         }
@@ -66,11 +97,10 @@ public class ButtonFrame extends JFrame {
                 Sheet sheet = workbook.getSheetAt(0);
                 int rowCount = sheet.getPhysicalNumberOfRows();
                 Row row = sheet.createRow(rowCount + 1);
-                for (int cellIndex = 0; cellIndex < newRow.size(); cellIndex++) {
-                    Cell cell = row.createCell(cellIndex);
-                    cell.setCellValue(newRow.get(cellIndex));
-                }
-
+                Cell name = row.createCell(1);
+                name.setCellValue(newRow.get(0));
+                Cell uri = row.createCell(8);
+                uri.setCellValue(newRow.get(1));
                 try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                     workbook.write(fio);
                 }
