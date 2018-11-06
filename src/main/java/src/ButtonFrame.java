@@ -16,8 +16,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +26,10 @@ public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
-    private List<String> content = new ArrayList<>();
-    int globalIndex = 0;
+    private JTextField name;
+    private JTextField uri;
+    private boolean nameIsPresent = false;
+    private boolean uriIsPresent = false;
 
     public ButtonFrame() {
         super();
@@ -38,7 +38,6 @@ public class ButtonFrame extends JFrame {
         logger.setLevel(Level.OFF);
         constuctGUI();
         worker = new ClipboardWorker();
-
     }
 
     private void constuctGUI() {
@@ -47,17 +46,21 @@ public class ButtonFrame extends JFrame {
         } catch (NativeHookException e) {
             e.printStackTrace();
         }
+        setLayout(new FlowLayout());
         GlobalScreen.addNativeKeyListener(new KeyListener());
-        setMinimumSize(new Dimension(200, 75));
+        setMinimumSize(new Dimension(420, 130));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
-        JPanel panel = new JPanel();
+        name = new JTextField(20);
+        uri = new JTextField(35);
 
         JButton getFileChooser = new JButton("Choose file");
         getFileChooser.addActionListener(new FileChooserListener());
-        panel.add(getFileChooser);
-        getContentPane().add(panel);
+
+        add(name);
+        add(uri);
+        add(getFileChooser);
 
         setVisible(true);
     }
@@ -65,40 +68,51 @@ public class ButtonFrame extends JFrame {
     private class KeyListener implements NativeKeyListener {
 
         @Override
-        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {}
+        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
+        }
 
         @Override
-        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {}
+        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+        }
 
         @Override
         public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
-            System.out.println("Key Released: " + NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode()));
             if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
-                content.add(globalIndex, worker.getClipboardContents());
-                System.out.println(content.get(globalIndex));
-                if (globalIndex == 1) {
+                String content = worker.getClipboardContents();
+                setText(content);
+                if (nameIsPresent && uriIsPresent) {
                     try {
-                        writeFile(content);
+                        writeFile();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Ошибочка");
                     }
+                    nameIsPresent = false;
+                    uriIsPresent = false;
                 }
-                globalIndex = globalIndex == 0 ? 1 : 0;
             }
         }
-
     }
 
-    private void writeFile(List<String> newRow) throws IOException {
+    private void setText(String content) {
+        if (content.matches("http.*://.*")) {
+            uri.setText(content);
+            uriIsPresent = true;
+        } else {
+            name.setText(content);
+            nameIsPresent = true;
+        }
+    }
+
+    private void writeFile() throws IOException {
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             Workbook workbook = new XSSFWorkbook(bis);
             Sheet sheet = workbook.getSheetAt(0);
             int rowCount = sheet.getPhysicalNumberOfRows();
             Row row = sheet.createRow(rowCount + 1);
-            Cell name = row.createCell(1);
-            name.setCellValue(newRow.get(0));
-            Cell uri = row.createCell(8);
-            uri.setCellValue(newRow.get(1));
+            Cell nameCell = row.createCell(1);
+            nameCell.setCellValue(name.getText());
+            Cell uriCell = row.createCell(8);
+            uriCell.setCellValue(uri.getText());
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
             }

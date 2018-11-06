@@ -26,12 +26,11 @@ public class ClipboardWorker implements ClipboardOwner {
         Transferable contents = clipboard.getContents(null);
         boolean hasTransferableText =
                 (contents != null) &&
-                        contents.isDataFlavorSupported(DataFlavor.stringFlavor)
-                ;
+                        contents.isDataFlavorSupported(DataFlavor.stringFlavor);
         if (hasTransferableText) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex){
+            } catch (UnsupportedFlavorException ex) {
                 JOptionPane.showMessageDialog(null, ex);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, ex);
