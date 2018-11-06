@@ -28,8 +28,6 @@ public class ButtonFrame extends JFrame {
     private File file = null;
     private JTextField name;
     private JTextField uri;
-    private boolean nameIsPresent = false;
-    private boolean uriIsPresent = false;
 
     public ButtonFrame() {
         super();
@@ -90,10 +88,8 @@ public class ButtonFrame extends JFrame {
     private void setText(String content) {
         if (content.matches("http.*://.*")) {
             uri.setText(content);
-            uriIsPresent = true;
         } else {
             name.setText(content);
-            nameIsPresent = true;
         }
     }
 
@@ -104,9 +100,9 @@ public class ButtonFrame extends JFrame {
             int rowCount = sheet.getPhysicalNumberOfRows();
             Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
-            nameCell.setCellValue(name.getText());
+            nameCell.setCellValue(name.getText().equals("") ? "undefined" : name.getText());
             Cell uriCell = row.createCell(8);
-            uriCell.setCellValue(uri.getText());
+            uriCell.setCellValue(uri.getText().equals("") ? "undefined" : uri.getText());
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
             }
@@ -122,10 +118,8 @@ public class ButtonFrame extends JFrame {
             try {
                 writeFile();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Какая-то ошибка.!");
+                JOptionPane.showMessageDialog(null, "Какая-то ошибка!");
             }
-            nameIsPresent = false;
-            uriIsPresent = false;
         }
     }
 
