@@ -102,7 +102,7 @@ public class ButtonFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "Формат файла должен быть .xls или .xlsx!");
             }
 
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheet("НАЗВАНИЕ_ЛИСТА");
             int rowCount = sheet.getPhysicalNumberOfRows();
             Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
