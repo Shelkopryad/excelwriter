@@ -52,15 +52,15 @@ public class ButtonFrame extends JFrame {
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout(FlowLayout.LEFT));
-        setMinimumSize(new Dimension(490, 130));
+        setMinimumSize(new Dimension(405, 130));
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
         JLabel nameLbl = new JLabel(" - название");
         JLabel uriLbl = new JLabel(" - URL");
-        name = new JTextField(35);
-        uri = new JTextField(35);
+        name = new JTextField(40);
+        uri = new JTextField(40);
 
         JButton save = new JButton("Write");
         save.addActionListener(new CopyListener());
