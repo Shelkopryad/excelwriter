@@ -13,7 +13,6 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,33 +28,37 @@ public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
-    private JLabel nameLbl, uriLbl;
     private JTextField name, uri;
 
     public ButtonFrame() {
         super();
-        GlobalScreen.setEventDispatcher(new SwingDispatchService());
-        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-        logger.setLevel(Level.OFF);
+        setGlobalKeyListner();
         constuctGUI();
         worker = new ClipboardWorker();
     }
 
-    private void constuctGUI() {
+    private void setGlobalKeyListner() {
+        GlobalScreen.setEventDispatcher(new SwingDispatchService());
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
         try {
             GlobalScreen.registerNativeHook();
         } catch (NativeHookException e) {
             e.printStackTrace();
         }
-        setLayout(new FlowLayout(FlowLayout.LEFT));
         GlobalScreen.addNativeKeyListener(new KeyListener());
+    }
+
+    private void constuctGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout(FlowLayout.LEFT));
         setMinimumSize(new Dimension(490, 130));
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
-        nameLbl = new JLabel(" - название");
-        uriLbl = new JLabel(" - URL");
+
+        JLabel nameLbl = new JLabel(" - название");
+        JLabel uriLbl = new JLabel(" - URL");
         name = new JTextField(35);
         uri = new JTextField(35);
 
@@ -72,25 +75,6 @@ public class ButtonFrame extends JFrame {
         add(getFileChooser);
 
         setVisible(true);
-    }
-
-    private class KeyListener implements NativeKeyListener {
-
-        @Override
-        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
-        }
-
-        @Override
-        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
-        }
-
-        @Override
-        public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
-            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
-                String content = worker.getClipboardContents();
-                setText(content);
-            }
-        }
     }
 
     private void setText(String content) {
@@ -132,6 +116,25 @@ public class ButtonFrame extends JFrame {
         }
     }
 
+    private class KeyListener implements NativeKeyListener {
+
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
+        }
+
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+        }
+
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
+            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
+                String content = worker.getClipboardContents();
+                setText(content);
+            }
+        }
+    }
+
     private class CopyListener implements ActionListener {
 
         @Override
@@ -155,7 +158,7 @@ public class ButtonFrame extends JFrame {
 
                 @Override
                 public String getDescription() {
-                    return file.getName();
+                    return null;
                 }
             });
             int ret = chooser.showDialog(null, "Открыть файл");
