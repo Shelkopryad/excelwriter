@@ -87,6 +87,7 @@ public class ButtonFrame extends JFrame {
 
     private void writeFile() throws IOException {
         String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('.') + 1);
+        final String UNDEFINED = "UNDEFINED";
         Workbook workbook = null;
 
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
@@ -105,9 +106,9 @@ public class ButtonFrame extends JFrame {
             int rowCount = sheet.getPhysicalNumberOfRows();
             Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
-            nameCell.setCellValue(name.getText().equals("") ? "undefined" : name.getText());
+            nameCell.setCellValue(name.getText().equals("") ? UNDEFINED : name.getText());
             Cell uriCell = row.createCell(8);
-            uriCell.setCellValue(uri.getText().equals("") ? "undefined" : uri.getText());
+            uriCell.setCellValue(uri.getText().equals("") ? UNDEFINED : uri.getText());
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
             }
