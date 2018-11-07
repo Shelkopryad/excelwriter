@@ -1,5 +1,6 @@
 package src;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,8 +27,8 @@ public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
-    private JTextField name;
-    private JTextField uri;
+    private JLabel nameLbl, uriLbl;
+    private JTextField name, uri;
 
     public ButtonFrame() {
         super();
@@ -44,13 +45,16 @@ public class ButtonFrame extends JFrame {
         } catch (NativeHookException e) {
             e.printStackTrace();
         }
-        setLayout(new FlowLayout());
+        setLayout(new FlowLayout(FlowLayout.LEFT));
         GlobalScreen.addNativeKeyListener(new KeyListener());
-        setMinimumSize(new Dimension(420, 130));
+        setMinimumSize(new Dimension(490, 130));
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
-        name = new JTextField(20);
+        nameLbl = new JLabel(" - название");
+        uriLbl = new JLabel(" - URL");
+        name = new JTextField(35);
         uri = new JTextField(35);
 
         JButton save = new JButton("Write");
@@ -59,7 +63,9 @@ public class ButtonFrame extends JFrame {
         getFileChooser.addActionListener(new FileChooserListener());
 
         add(name);
+        add(nameLbl);
         add(uri);
+        add(uriLbl);
         add(save);
         add(getFileChooser);
 
@@ -94,8 +100,21 @@ public class ButtonFrame extends JFrame {
     }
 
     private void writeFile() throws IOException {
+        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('.') + 1);
+        Workbook workbook = null;
+
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-            Workbook workbook = new XSSFWorkbook(bis);
+            switch (extension) {
+                case "xlsx":
+                    workbook = new XSSFWorkbook(bis);
+                    break;
+                case "xls":
+                    workbook = new HSSFWorkbook(bis);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Формат файла должен быть .xls или .xlsx!");
+            }
+
             Sheet sheet = workbook.getSheetAt(0);
             int rowCount = sheet.getPhysicalNumberOfRows();
             Row row = sheet.createRow(rowCount);
