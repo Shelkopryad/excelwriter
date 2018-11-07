@@ -13,6 +13,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
+import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -145,6 +147,17 @@ public class ButtonFrame extends JFrame {
     private class FileChooserListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.getAbsolutePath().endsWith("xls") || file.getAbsolutePath().endsWith("xlsx");
+                }
+
+                @Override
+                public String getDescription() {
+                    return file.getName();
+                }
+            });
             int ret = chooser.showDialog(null, "Открыть файл");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
