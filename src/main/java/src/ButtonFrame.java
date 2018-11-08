@@ -14,7 +14,6 @@ import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -51,21 +50,33 @@ public class ButtonFrame extends JFrame {
 
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        setMinimumSize(new Dimension(405, 130));
+        setLayout(null);
+        setSize(430, 130);
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
-        JLabel nameLbl = new JLabel(" - название");
-        JLabel uriLbl = new JLabel(" - URL");
+        JLabel nameLbl = new JLabel("Название");
+        JLabel uriLbl = new JLabel("URL");
         name = new JTextField(40);
         uri = new JTextField(40);
+        nameLbl.setSize(60, 20);
+        nameLbl.setLocation(10, 10);
+        uriLbl.setSize(60, 20);
+        uriLbl.setLocation(10, 35);
+        name.setSize(350, 20);
+        name.setLocation(65, 10);
+        uri.setSize(350, 20);
+        uri.setLocation(65, 35);
 
         JButton save = new JButton("Write");
         save.addActionListener(new CopyListener());
         JButton getFileChooser = new JButton("Choose file");
         getFileChooser.addActionListener(new FileChooserListener());
+        save.setSize(100, 30);
+        save.setLocation(210, 60);
+        getFileChooser.setSize(100, 30);
+        getFileChooser.setLocation(315, 60);
 
         add(name);
         add(nameLbl);
