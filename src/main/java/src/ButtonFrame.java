@@ -26,29 +26,14 @@ import java.util.logging.Logger;
  */
 public class ButtonFrame extends JFrame {
 
-    private ClipboardHelper clipboardHelper;
     private RestHelper restHelper;
     private File file = null;
     private JTextField name, uri, email, phone;
 
     public ButtonFrame() {
         super("Personal Jesus");
-        setGlobalKeyListner();
         constuctGUI();
-        clipboardHelper = ClipboardHelper.getInstance();
         restHelper = RestHelper.getInstance();
-    }
-
-    private void setGlobalKeyListner() {
-        GlobalScreen.setEventDispatcher(new SwingDispatchService());
-        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-        logger.setLevel(Level.OFF);
-        try {
-            GlobalScreen.registerNativeHook();
-        } catch (NativeHookException e) {
-            e.printStackTrace();
-        }
-        GlobalScreen.addNativeKeyListener(new KeyListener());
     }
 
     private void constuctGUI() {
@@ -59,32 +44,32 @@ public class ButtonFrame extends JFrame {
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
-        JLabel nameLbl = new JLabel("Название");
         JLabel uriLbl = new JLabel("URL");
+        JLabel nameLbl = new JLabel("Название");
         JLabel phoneLbl = new JLabel("Телефон");
         JLabel emailLbl = new JLabel("Email");
+        uri = new JTextField(40);
         name = new JTextField(40);
         phone = new JTextField(40);
         email = new JTextField(40);
-        uri = new JTextField(40);
 
-        nameLbl.setSize(60, 20);
-        nameLbl.setLocation(10, 10);
-        phoneLbl.setSize(60, 20);
-        phoneLbl.setLocation(10, 35);
-        emailLbl.setSize(60, 20);
-        emailLbl.setLocation(10, 60);
         uriLbl.setSize(60, 20);
-        uriLbl.setLocation(10, 85);
+        uriLbl.setLocation(10, 10);
+        nameLbl.setSize(60, 20);
+        nameLbl.setLocation(10, 35);
+        phoneLbl.setSize(60, 20);
+        phoneLbl.setLocation(10, 60);
+        emailLbl.setSize(60, 20);
+        emailLbl.setLocation(10, 85);
 
-        name.setSize(350, 20);
-        name.setLocation(70, 10);
-        phone.setSize(350, 20);
-        phone.setLocation(70, 35);
-        email.setSize(350, 20);
-        email.setLocation(70, 60);
         uri.setSize(350, 20);
-        uri.setLocation(70, 85);
+        uri.setLocation(70, 10);
+        name.setSize(350, 20);
+        name.setLocation(70, 35);
+        phone.setSize(350, 20);
+        phone.setLocation(70, 60);
+        email.setSize(350, 20);
+        email.setLocation(70, 85);
 
         JButton save = new JButton("Write");
         JButton getFileChooser = new JButton("Choose file");
@@ -109,29 +94,45 @@ public class ButtonFrame extends JFrame {
         setVisible(true);
     }
 
-    private void setText(String content) {
-        content = content.trim();
-
-        if (content.matches("http.*://.*")) {
-            uri.setText(content);
-        } else if (content.matches("\\+[\\d( )?]*")) {
-            phone.setText(content);
-        } else if (content.matches("[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
-            email.setText(content);
-        } else {
-            name.setText(content);
-        }
-    }
-
     private void writeFile(Response response) throws IOException {
-        if (file == null) {
+        Workbook workbook = getWorkbook();
+        if (workbook == null) {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
             return;
         }
-        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('.') + 1);
-        System.out.println(extension);
-        Workbook workbook = null;
+        Sheet sheet = workbook.getSheet("LIST_NAME");
+        int rowCount = sheet.getLastRowNum() + 1;
+        Row row = sheet.createRow(rowCount);
+        Cell nameCell = row.createCell(1);
+        Cell phoneCell = row.createCell(3);
+        Cell emailCell = row.createCell(4);
+        Cell uriCell = row.createCell(6);
 
+        String uriS = uri.getText();
+        String nameS = restHelper.getValue(response, "applicant.shortName");
+        String phoneS = restHelper.getValue(response, "applicant.contacts[0].value");
+        String emailS = restHelper.getValue(response, "applicant.contacts[1].value");
+
+        name.setText(nameS);
+        phone.setText(phoneS);
+        email.setText(emailS);
+
+        nameCell.setCellValue(nameS);
+        phoneCell.setCellValue(phoneS);
+        emailCell.setCellValue(emailS);
+        uriCell.setCellValue(uriS);
+
+        try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
+            workbook.write(fio);
+        }
+    }
+
+    private Workbook getWorkbook() {
+        if (file == null) {
+            return null;
+        }
+        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('.') + 1);
+        Workbook workbook = null;
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             switch (extension) {
                 case "xlsx":
@@ -143,54 +144,10 @@ public class ButtonFrame extends JFrame {
                 default:
                     JOptionPane.showMessageDialog(null, "Формат файла должен быть .xls или .xlsx!");
             }
-
-            Sheet sheet = workbook.getSheet("LIST_NAME");
-            int rowCount = sheet.getLastRowNum() + 1;
-            Row row = sheet.createRow(rowCount);
-            Cell nameCell = row.createCell(1);
-            Cell phoneCell = row.createCell(3);
-            Cell emailCell = row.createCell(4);
-            Cell uriCell = row.createCell(6);
-
-            String uriS = uri.getText();
-            String nameS = restHelper.getValue(response, "applicant.shortName");
-            String phoneS = restHelper.getValue(response, "applicant.contacts[0].value");
-            String emailS = restHelper.getValue(response, "applicant.contacts[1].value");
-
-            name.setText(nameS);
-            phone.setText(phoneS);
-            email.setText(emailS);
-
-            nameCell.setCellValue(nameS);
-            phoneCell.setCellValue(phoneS);
-            emailCell.setCellValue(emailS);
-            uriCell.setCellValue(uriS);
-
-            try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
-                workbook.write(fio);
-            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
         }
-    }
-
-    private class KeyListener implements NativeKeyListener {
-
-        @Override
-        public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
-        }
-
-        @Override
-        public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
-        }
-
-        @Override
-        public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
-            if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
-                String content = clipboardHelper.getClipboardContents();
-                setText(content);
-            }
-        }
+        return workbook;
     }
 
     private class CopyListener implements ActionListener {

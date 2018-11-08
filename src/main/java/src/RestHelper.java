@@ -31,11 +31,11 @@ public class RestHelper {
     }
 
     public Response getResponse(String url) {
-        url = getApiUrl(url);
-        RestAssured.baseURI = url;
+        String apiUrl = getApiUrl(url);
+        RestAssured.baseURI = apiUrl;
         RequestSpecification specification = new RequestSpecBuilder()
                 .addHeader("Referer", url)
-                .addHeader("Authorization", "qwe")
+                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiI4MTI4ZjQ2ZC00OWRkLTRmZmUtYWZlNy01ZWU5ODZhMGE1YjUiLCJzdWIiOiJhbm9ueW1vdXMiLCJleHAiOjE1NDI1NTg2MDh9.FpdzGi3s6atKKc7a51G_bXyH32F_bQ9_SvU1jCBVk2JlwOgFBzhIJXQJz5MB7uWcDFHx7au1Z77udgBHOXypZw")
                 .build();
 
         return RestAssured.given().spec(specification).get();
