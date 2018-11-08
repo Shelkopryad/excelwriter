@@ -27,10 +27,10 @@ public class ButtonFrame extends JFrame {
 
     private ClipboardWorker worker;
     private File file = null;
-    private JTextField name, uri;
+    private JTextField name, uri, email, phone;
 
     public ButtonFrame() {
-        super();
+        super("Personal Jesus");
         setGlobalKeyListner();
         constuctGUI();
         worker = ClipboardWorker.getInstance();
@@ -51,37 +51,55 @@ public class ButtonFrame extends JFrame {
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        setSize(430, 130);
+        setSize(430, 175);
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
         JLabel nameLbl = new JLabel("Название");
         JLabel uriLbl = new JLabel("URL");
+        JLabel phoneLbl = new JLabel("Телефон");
+        JLabel emailLbl = new JLabel("Email");
         name = new JTextField(40);
+        phone = new JTextField(40);
+        email = new JTextField(40);
         uri = new JTextField(40);
+
         nameLbl.setSize(60, 20);
         nameLbl.setLocation(10, 10);
+        phoneLbl.setSize(60, 20);
+        phoneLbl.setLocation(10, 35);
+        emailLbl.setSize(60, 20);
+        emailLbl.setLocation(10, 60);
         uriLbl.setSize(60, 20);
-        uriLbl.setLocation(10, 35);
+        uriLbl.setLocation(10, 85);
+
         name.setSize(350, 20);
         name.setLocation(65, 10);
+        phone.setSize(350, 20);
+        phone.setLocation(65, 35);
+        email.setSize(350, 20);
+        email.setLocation(65, 60);
         uri.setSize(350, 20);
-        uri.setLocation(65, 35);
+        uri.setLocation(65, 85);
 
         JButton save = new JButton("Write");
-        save.addActionListener(new CopyListener());
         JButton getFileChooser = new JButton("Choose file");
+        save.addActionListener(new CopyListener());
         getFileChooser.addActionListener(new FileChooserListener());
         save.setSize(100, 30);
-        save.setLocation(210, 60);
+        save.setLocation(210, 110);
         getFileChooser.setSize(100, 30);
-        getFileChooser.setLocation(315, 60);
+        getFileChooser.setLocation(315, 110);
 
-        add(name);
         add(nameLbl);
-        add(uri);
+        add(name);
+        add(phoneLbl);
+        add(phone);
+        add(emailLbl);
+        add(email);
         add(uriLbl);
+        add(uri);
         add(save);
         add(getFileChooser);
 
@@ -89,8 +107,14 @@ public class ButtonFrame extends JFrame {
     }
 
     private void setText(String content) {
+        content = content.trim();
+
         if (content.matches("http.*://.*")) {
             uri.setText(content);
+        } else if (content.matches("\\+[\\d( )?]*")) {
+            phone.setText(content);
+        } else if (content.matches("[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
+            email.setText(content);
         } else {
             name.setText(content);
         }
@@ -113,12 +137,16 @@ public class ButtonFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "Формат файла должен быть .xls или .xlsx!");
             }
 
-            Sheet sheet = workbook.getSheet("НАЗВАНИЕ_ЛИСТА");
-            int rowCount = sheet.getPhysicalNumberOfRows();
+            Sheet sheet = workbook.getSheet("LIST_NAME");
+            int rowCount = sheet.getLastRowNum() + 1;
             Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
             nameCell.setCellValue(name.getText().equals("") ? UNDEFINED : name.getText());
-            Cell uriCell = row.createCell(8);
+            Cell phoneCell = row.createCell(3);
+            phoneCell.setCellValue(phone.getText().equals("") ? UNDEFINED : phone.getText());
+            Cell emailCell = row.createCell(4);
+            emailCell.setCellValue(email.getText().equals("") ? UNDEFINED : email.getText());
+            Cell uriCell = row.createCell(6);
             uriCell.setCellValue(uri.getText().equals("") ? UNDEFINED : uri.getText());
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
