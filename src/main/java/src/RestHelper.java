@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class RestHelper {
 
     private static RestHelper instance;
+    private final String authorization = "qwe";
 
     private RestHelper() {
 
@@ -35,7 +36,7 @@ public class RestHelper {
         RestAssured.baseURI = apiUrl;
         RequestSpecification specification = new RequestSpecBuilder()
                 .addHeader("Referer", url)
-                .addHeader("Authorization", "qwe")
+                .addHeader("Authorization", authorization)
                 .build();
 
         return RestAssured.given().spec(specification).get();

@@ -7,19 +7,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Shelkopryad on 06.11.2018.
@@ -100,7 +93,7 @@ public class ButtonFrame extends JFrame {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
             return;
         }
-        Sheet sheet = workbook.getSheet("LIST_NAME");
+        Sheet sheet = workbook.getSheet("LIST");
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
         Cell nameCell = row.createCell(1);
