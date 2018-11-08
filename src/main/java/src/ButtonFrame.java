@@ -141,12 +141,12 @@ public class ButtonFrame extends JFrame {
             int rowCount = sheet.getLastRowNum() + 1;
             Row row = sheet.createRow(rowCount);
             Cell nameCell = row.createCell(1);
-            nameCell.setCellValue(name.getText().equals("") ? UNDEFINED : name.getText());
             Cell phoneCell = row.createCell(3);
-            phoneCell.setCellValue(phone.getText().equals("") ? UNDEFINED : phone.getText());
             Cell emailCell = row.createCell(4);
-            emailCell.setCellValue(email.getText().equals("") ? UNDEFINED : email.getText());
             Cell uriCell = row.createCell(6);
+            nameCell.setCellValue(name.getText().equals("") ? UNDEFINED : name.getText());
+            phoneCell.setCellValue(phone.getText().equals("") ? UNDEFINED : phone.getText());
+            emailCell.setCellValue(email.getText().equals("") ? UNDEFINED : email.getText());
             uriCell.setCellValue(uri.getText().equals("") ? UNDEFINED : uri.getText());
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
