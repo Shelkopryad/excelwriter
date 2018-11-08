@@ -1,5 +1,6 @@
 package src;
 
+import io.restassured.response.Response;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,7 +26,8 @@ import java.util.logging.Logger;
  */
 public class ButtonFrame extends JFrame {
 
-    private ClipboardHelper helper;
+    private ClipboardHelper clipboardHelper;
+    private RestHelper restHelper;
     private File file = null;
     private JTextField name, uri, email, phone;
 
@@ -33,7 +35,8 @@ public class ButtonFrame extends JFrame {
         super("Personal Jesus");
         setGlobalKeyListner();
         constuctGUI();
-        helper = ClipboardHelper.getInstance();
+        clipboardHelper = ClipboardHelper.getInstance();
+        restHelper = RestHelper.getInstance();
     }
 
     private void setGlobalKeyListner() {
@@ -51,7 +54,7 @@ public class ButtonFrame extends JFrame {
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        setSize(430, 175);
+        setSize(440, 180);
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
@@ -75,13 +78,13 @@ public class ButtonFrame extends JFrame {
         uriLbl.setLocation(10, 85);
 
         name.setSize(350, 20);
-        name.setLocation(65, 10);
+        name.setLocation(70, 10);
         phone.setSize(350, 20);
-        phone.setLocation(65, 35);
+        phone.setLocation(70, 35);
         email.setSize(350, 20);
-        email.setLocation(65, 60);
+        email.setLocation(70, 60);
         uri.setSize(350, 20);
-        uri.setLocation(65, 85);
+        uri.setLocation(70, 85);
 
         JButton save = new JButton("Write");
         JButton getFileChooser = new JButton("Choose file");
@@ -120,9 +123,13 @@ public class ButtonFrame extends JFrame {
         }
     }
 
-    private void writeFile() throws IOException {
+    private void writeFile(Response response) throws IOException {
+        if (file == null) {
+            JOptionPane.showMessageDialog(null, "Не выбран файл!");
+            return;
+        }
         String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf('.') + 1);
-        final String UNDEFINED = "UNDEFINED";
+        System.out.println(extension);
         Workbook workbook = null;
 
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
@@ -144,10 +151,21 @@ public class ButtonFrame extends JFrame {
             Cell phoneCell = row.createCell(3);
             Cell emailCell = row.createCell(4);
             Cell uriCell = row.createCell(6);
-            nameCell.setCellValue(name.getText().equals("") ? UNDEFINED : name.getText());
-            phoneCell.setCellValue(phone.getText().equals("") ? UNDEFINED : phone.getText());
-            emailCell.setCellValue(email.getText().equals("") ? UNDEFINED : email.getText());
-            uriCell.setCellValue(uri.getText().equals("") ? UNDEFINED : uri.getText());
+
+            String uriS = uri.getText();
+            String nameS = restHelper.getValue(response, "applicant.shortName");
+            String phoneS = restHelper.getValue(response, "applicant.contacts[0].value");
+            String emailS = restHelper.getValue(response, "applicant.contacts[1].value");
+
+            name.setText(nameS);
+            phone.setText(phoneS);
+            email.setText(emailS);
+
+            nameCell.setCellValue(nameS);
+            phoneCell.setCellValue(phoneS);
+            emailCell.setCellValue(emailS);
+            uriCell.setCellValue(uriS);
+
             try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
                 workbook.write(fio);
             }
@@ -169,7 +187,7 @@ public class ButtonFrame extends JFrame {
         @Override
         public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
             if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
-                String content = helper.getClipboardContents();
+                String content = clipboardHelper.getClipboardContents();
                 setText(content);
             }
         }
@@ -179,8 +197,11 @@ public class ButtonFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            String baseUri = uri.getText();
+            Response response = restHelper.getResponse(baseUri);
+
             try {
-                writeFile();
+                writeFile(response);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "Какая-то ошибка!");
             }
