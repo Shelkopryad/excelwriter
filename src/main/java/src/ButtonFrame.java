@@ -33,7 +33,7 @@ public class ButtonFrame extends JFrame {
         super();
         setGlobalKeyListner();
         constuctGUI();
-        worker = new ClipboardWorker();
+        worker = ClipboardWorker.getInstance();
     }
 
     private void setGlobalKeyListner() {
@@ -179,5 +179,4 @@ public class ButtonFrame extends JFrame {
             }
         }
     }
-
 }

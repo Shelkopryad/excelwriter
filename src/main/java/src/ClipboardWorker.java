@@ -10,6 +10,18 @@ import java.io.IOException;
  */
 public class ClipboardWorker implements ClipboardOwner {
 
+    private static ClipboardWorker instance;
+
+    private ClipboardWorker() {
+    }
+
+    public static ClipboardWorker getInstance() {
+        if (instance == null) {
+            instance = new ClipboardWorker();
+        }
+        return instance;
+    }
+
     public void lostOwnership(Clipboard clipboard, Transferable transferable) {
 
     }
@@ -30,13 +42,10 @@ public class ClipboardWorker implements ClipboardOwner {
         if (hasTransferableText) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex) {
-                JOptionPane.showMessageDialog(null, ex);
-            } catch (IOException ex) {
+            } catch (UnsupportedFlavorException | IOException ex) {
                 JOptionPane.showMessageDialog(null, ex);
             }
         }
         return result;
     }
-
 }
