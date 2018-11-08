@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class ButtonFrame extends JFrame {
 
-    private ClipboardWorker worker;
+    private ClipboardHelper helper;
     private File file = null;
     private JTextField name, uri, email, phone;
 
@@ -33,7 +33,7 @@ public class ButtonFrame extends JFrame {
         super("Personal Jesus");
         setGlobalKeyListner();
         constuctGUI();
-        worker = ClipboardWorker.getInstance();
+        helper = ClipboardHelper.getInstance();
     }
 
     private void setGlobalKeyListner() {
@@ -169,7 +169,7 @@ public class ButtonFrame extends JFrame {
         @Override
         public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
             if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_TAB) {
-                String content = worker.getClipboardContents();
+                String content = helper.getClipboardContents();
                 setText(content);
             }
         }

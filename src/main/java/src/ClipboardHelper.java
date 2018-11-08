@@ -8,16 +8,16 @@ import java.io.IOException;
 /**
  * Created by Shelkopryad on 06.11.2018.
  */
-public class ClipboardWorker implements ClipboardOwner {
+public class ClipboardHelper implements ClipboardOwner {
 
-    private static ClipboardWorker instance;
+    private static ClipboardHelper instance;
 
-    private ClipboardWorker() {
+    private ClipboardHelper() {
     }
 
-    public static ClipboardWorker getInstance() {
+    public static ClipboardHelper getInstance() {
         if (instance == null) {
-            instance = new ClipboardWorker();
+            instance = new ClipboardHelper();
         }
         return instance;
     }
