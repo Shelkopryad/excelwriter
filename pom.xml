@@ -13,7 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rest.assured.version>3.0.0</rest.assured.version>
         <poi.version>4.0.0</poi.version>
-        <jnativehook.version>2.1.0</jnativehook.version>
     </properties>
 
     <build>
@@ -80,11 +79,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.1stleg</groupId>
-            <artifactId>jnativehook</artifactId>
-            <version>${jnativehook.version}</version>
         </dependency>
     </dependencies>
 
