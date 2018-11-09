@@ -93,7 +93,7 @@ public class ButtonFrame extends JFrame {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
             return;
         }
-        Sheet sheet = workbook.getSheet("LIST");
+        Sheet sheet = workbook.getSheet("list");
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
         Cell nameCell = row.createCell(1);
@@ -102,9 +102,9 @@ public class ButtonFrame extends JFrame {
         Cell uriCell = row.createCell(6);
 
         String uriS = uri.getText();
-        String nameS = restHelper.getValue(response, "applicant.shortName");
-        String phoneS = restHelper.getValue(response, "applicant.contacts[0].value");
-        String emailS = restHelper.getValue(response, "applicant.contacts[1].value");
+        String nameS = restHelper.getValue("applicant.shortName");
+        String phoneS = restHelper.getValue("applicant.contacts[0].value");
+        String emailS = restHelper.getValue("applicant.contacts[1].value");
 
         name.setText(nameS);
         phone.setText(phoneS);

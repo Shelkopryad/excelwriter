@@ -5,6 +5,8 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +16,8 @@ import java.util.regex.Pattern;
 public class RestHelper {
 
     private static RestHelper instance;
-    private final String authorization = "qwe";
+    private final String authorization = "token";
+    private Response response;
 
     private RestHelper() {
 
@@ -27,22 +30,26 @@ public class RestHelper {
         return instance;
     }
 
-    public String getValue(Response response, String path) {
+    public String getValue(String path) {
         return response.body().path(path).toString();
     }
 
     public Response getResponse(String url) {
         String apiUrl = getApiUrl(url);
-        RestAssured.baseURI = apiUrl;
-        RequestSpecification specification = new RequestSpecBuilder()
-                .addHeader("Referer", url)
-                .addHeader("Authorization", authorization)
-                .build();
+        RequestSpecification specification = RestAssured.given().baseUri(apiUrl);
+        specification.headers(new HashMap<String, String>() {{
+            put("Referer", url);
+            put("Authorization", authorization);
+        }});
+        response = specification.get();
 
-        return RestAssured.given().spec(specification).get();
+        return response;
     }
 
     private String getApiUrl(String baseUrl) {
+
+        System.out.println(baseUrl);
+
         String start = "https://pub.fsa.gov.ru/api/v1/rds/common/declarations/";
 
         Pattern pattern = Pattern.compile("(\\d)+");
