@@ -100,7 +100,13 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
             return;
         }
-        pushInfo(workbook);
+
+        boolean flag = pushInfo(workbook);
+        if (!flag) {
+            JOptionPane.showMessageDialog(null, "Ошибка. Свяжитесь с разработчиком.");
+            return;
+        }
+
         try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
             workbook.write(fio);
         }
@@ -124,15 +130,20 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "Формат файла должен быть .xls или .xlsx!");
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Не выбран файл!");
+            JOptionPane.showMessageDialog(null, "Неизвестная ошибка!");
         }
         return workbook;
     }
 
-    private void pushInfo(Workbook workbook) {
+    private boolean pushInfo(Workbook workbook) {
         Sheet sheet = workbook.getSheet(props.getProperty("listName"));
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
+
+        if (props.getProperty("nameInd") == null || props.getProperty("phoneInd") == null || props.getProperty("emailInd") == null || props.getProperty("uriInd") == null) {
+            return false;
+        }
+
         Cell nameCell = row.createCell(Integer.parseInt(props.getProperty("nameInd")) - 1);
         Cell phoneCell = row.createCell(Integer.parseInt(props.getProperty("phoneInd")) - 1);
         Cell emailCell = row.createCell(Integer.parseInt(props.getProperty("emailInd")) - 1);
@@ -151,6 +162,7 @@ public class MainFrame extends JFrame {
         phoneCell.setCellValue(phone);
         emailCell.setCellValue(email);
         uriCell.setCellValue(uri);
+        return true;
     }
 
     private class GetSettingsListener implements ActionListener {
@@ -172,7 +184,7 @@ public class MainFrame extends JFrame {
             try {
                 writeFile();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Какая-то ошибка! Наши эксперты уже разбираются!");
+                JOptionPane.showMessageDialog(null, "Ошибка записи в файл!");
             }
         }
     }
