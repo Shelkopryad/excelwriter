@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 public class Settings extends JFrame {
 
     private Props props;
-    private JTextField tokenField, uriIngex, nameIndex, phoneIndex, emailIndex, listName;
+    private JTextField tokenField, uriIndex, nameIndex, phoneIndex, emailIndex, listName;
 
     public Settings() {
         super("Settings");
@@ -47,7 +47,7 @@ public class Settings extends JFrame {
         emailLbl.setLocation(135, 85);
 
         tokenField = new JTextField(50);
-        uriIngex = new JTextField(2);
+        uriIndex = new JTextField(2);
         nameIndex = new JTextField(2);
         phoneIndex = new JTextField(2);
         emailIndex = new JTextField(2);
@@ -57,8 +57,8 @@ public class Settings extends JFrame {
         tokenField.setLocation(70, 10);
         listName.setSize(350, 20);
         listName.setLocation(70, 35);
-        uriIngex.setSize(20, 20);
-        uriIngex.setLocation(70, 60);
+        uriIndex.setSize(20, 20);
+        uriIndex.setLocation(70, 60);
         nameIndex.setSize(20, 20);
         nameIndex.setLocation(200, 60);
         phoneIndex.setSize(20, 20);
@@ -76,7 +76,7 @@ public class Settings extends JFrame {
         add(listNameLbl);
         add(listName);
         add(uriLbl);
-        add(uriIngex);
+        add(uriIndex);
         add(nameLbl);
         add(nameIndex);
         add(phoneLbl);
@@ -98,7 +98,7 @@ public class Settings extends JFrame {
         String emailInd = props.getProperty("emailInd");
         tokenField.setText(token);
         listName.setText(list);
-        uriIngex.setText(uriInd);
+        uriIndex.setText(uriInd);
         nameIndex.setText(nameInd);
         phoneIndex.setText(phoneInd);
         emailIndex.setText(emailInd);
@@ -110,7 +110,7 @@ public class Settings extends JFrame {
         public void actionPerformed(ActionEvent actionEvent) {
             props.setProperty("token", tokenField.getText());
             props.setProperty("listName", listName.getText());
-            props.setProperty("uriInd", uriIngex.getText());
+            props.setProperty("uriInd", uriIndex.getText());
             props.setProperty("nameInd", nameIndex.getText());
             props.setProperty("phoneInd", phoneIndex.getText());
             props.setProperty("emailInd", emailIndex.getText());
