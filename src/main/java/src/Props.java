@@ -28,17 +28,16 @@ public class Props {
     private void load() {
         property = new Properties();
 
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            property.load(fis);
+        try(FileInputStream fis = new FileInputStream(file);
+            InputStreamReader reader = new InputStreamReader(fis, "ISO8859-1")) {
+            property.load(reader);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Файл свойств отсуствует!");
         }
     }
 
-    private void write() {
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
+    public void write() {
+        try(FileOutputStream fos = new FileOutputStream(file)) {
             property.store(fos, "Properties");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Файл свойств отсуствует!");
@@ -51,7 +50,6 @@ public class Props {
 
     public void setProperty(String key, String value) {
         property.setProperty(key, value);
-        write();
     }
 
 }

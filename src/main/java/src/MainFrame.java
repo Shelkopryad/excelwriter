@@ -16,84 +16,77 @@ import java.io.*;
 /**
  * Created by Shelkopryad on 06.11.2018.
  */
-public class ButtonFrame extends JFrame {
+public class MainFrame extends JFrame {
 
     private RestHelper restHelper;
+    private Props props;
     private File file = null;
-    private JTextField nameField, uriField, emailField, phoneField, tokenField;
+    private JTextField uriField, nameField, phoneField, emailField;
 
-    public ButtonFrame() {
+    public MainFrame() {
         super("Personal Jesus");
         constuctGUI();
-        loadProperties();
         restHelper = RestHelper.getInstance();
+        props = Props.getInstance();
     }
 
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        setSize(440, 205);
+        setSize(440, 180);
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
-        JLabel tokenLbl = new JLabel("Token");
         JLabel uriLbl = new JLabel("URL");
         JLabel nameLbl = new JLabel("Название");
         JLabel phoneLbl = new JLabel("Телефон");
         JLabel emailLbl = new JLabel("Email");
 
-        tokenField = new JTextField(40);
         uriField = new JTextField(40);
         nameField = new JTextField(40);
         phoneField = new JTextField(40);
         emailField = new JTextField(40);
 
-        tokenLbl.setSize(60, 20);
-        tokenLbl.setLocation(10, 10);
         uriLbl.setSize(60, 20);
-        uriLbl.setLocation(10, 35);
+        uriLbl.setLocation(10, 10);
         nameLbl.setSize(60, 20);
-        nameLbl.setLocation(10, 60);
+        nameLbl.setLocation(10, 35);
         phoneLbl.setSize(60, 20);
-        phoneLbl.setLocation(10, 85);
+        phoneLbl.setLocation(10, 60);
         emailLbl.setSize(60, 20);
-        emailLbl.setLocation(10, 110);
+        emailLbl.setLocation(10, 85);
 
-        tokenField.setSize(350, 20);
-        tokenField.setLocation(70, 10);
         uriField.setSize(350, 20);
-        uriField.setLocation(70, 35);
+        uriField.setLocation(70, 10);
         nameField.setSize(350, 20);
-        nameField.setLocation(70, 60);
+        nameField.setLocation(70, 35);
         phoneField.setSize(350, 20);
-        phoneField.setLocation(70, 85);
+        phoneField.setLocation(70, 60);
         emailField.setSize(350, 20);
-        emailField.setLocation(70, 110);
+        emailField.setLocation(70, 85);
 
-        JButton saveProperties = new JButton("Save token");
-        JButton save = new JButton("Write");
+        JButton saveProperties = new JButton("Settings");
+        JButton save = new JButton("Write file");
         JButton getFileChooser = new JButton("Choose file");
-        saveProperties.addActionListener(new SaveTokenListaner());
+        saveProperties.addActionListener(new GetSettingsListener());
         save.addActionListener(new CopyListener());
         getFileChooser.addActionListener(new FileChooserListener());
         saveProperties.setSize(100, 30);
-        saveProperties.setLocation(105, 140);
+        saveProperties.setLocation(105, 115);
         save.setSize(100, 30);
-        save.setLocation(210, 140);
+        save.setLocation(210, 115);
         getFileChooser.setSize(100, 30);
-        getFileChooser.setLocation(315, 140);
+        getFileChooser.setLocation(315, 115);
 
-        add(tokenLbl);
-        add(tokenField);
+        add(uriLbl);
+        add(uriField);
         add(nameLbl);
         add(nameField);
         add(phoneLbl);
         add(phoneField);
         add(emailLbl);
         add(emailField);
-        add(uriLbl);
-        add(uriField);
         add(saveProperties);
         add(save);
         add(getFileChooser);
@@ -137,7 +130,7 @@ public class ButtonFrame extends JFrame {
     }
 
     private void pushInfo(Workbook workbook) {
-        Sheet sheet = workbook.getSheet("list");
+        Sheet sheet = workbook.getSheet(props.getProperty("listName"));
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
         Cell nameCell = row.createCell(1);
@@ -146,9 +139,9 @@ public class ButtonFrame extends JFrame {
         Cell uriCell = row.createCell(8);
 
         String uri = uriField.getText();
-        String name = restHelper.getValue("applicant.shortName");
-        String phone = restHelper.getValue("applicant.contacts[0].value");
-        String email = restHelper.getValue("applicant.contacts[1].value");
+        String name = restHelper.getValue(props.getProperty("name"));
+        String phone = restHelper.getValue(props.getProperty("phone"));
+        String email = restHelper.getValue(props.getProperty("email"));
 
         nameField.setText(name);
         phoneField.setText(phone);
@@ -160,17 +153,11 @@ public class ButtonFrame extends JFrame {
         uriCell.setCellValue(uri);
     }
 
-    private void loadProperties() {
-        String token = Props.getInstance().getProperty("token");
-        tokenField.setText(token);
-    }
-
-    private class SaveTokenListaner implements ActionListener {
+    private class GetSettingsListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            String token = tokenField.getText();
-            Props.getInstance().setProperty("token", token);
+            new Settings();
         }
     }
 
@@ -178,7 +165,7 @@ public class ButtonFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            String token = tokenField.getText();
+            String token = props.getProperty("token");
             String baseUri = uriField.getText();
             restHelper.getResponse(baseUri, token);
 
