@@ -28,7 +28,7 @@ public class Props {
     private void load() {
         property = new Properties();
 
-        try(FileInputStream fis = new FileInputStream(file);
+        try (FileInputStream fis = new FileInputStream(file);
             InputStreamReader reader = new InputStreamReader(fis, "ISO8859-1")) {
             property.load(reader);
         } catch (IOException e) {
@@ -37,7 +37,7 @@ public class Props {
     }
 
     public void write() {
-        try(FileOutputStream fos = new FileOutputStream(file)) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             property.store(fos, "Properties");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Файл свойств отсуствует!");
