@@ -66,16 +66,16 @@ public class MainFrame extends JFrame {
         emailField.setSize(350, 20);
         emailField.setLocation(70, 85);
 
-        JButton saveProperties = new JButton("Settings");
-        JButton save = new JButton("Write file");
+        JButton getSettings = new JButton("Settings");
+        JButton writeTiFile = new JButton("Write file");
         JButton getFileChooser = new JButton("Choose file");
-        saveProperties.addActionListener(new GetSettingsListener());
-        save.addActionListener(new CopyListener());
+        getSettings.addActionListener(new GetSettingsListener());
+        writeTiFile.addActionListener(new CopyListener());
         getFileChooser.addActionListener(new FileChooserListener());
-        saveProperties.setSize(100, 30);
-        saveProperties.setLocation(105, 115);
-        save.setSize(100, 30);
-        save.setLocation(210, 115);
+        getSettings.setSize(100, 30);
+        getSettings.setLocation(105, 115);
+        writeTiFile.setSize(100, 30);
+        writeTiFile.setLocation(210, 115);
         getFileChooser.setSize(100, 30);
         getFileChooser.setLocation(315, 115);
 
@@ -87,8 +87,8 @@ public class MainFrame extends JFrame {
         add(phoneField);
         add(emailLbl);
         add(emailField);
-        add(saveProperties);
-        add(save);
+        add(getSettings);
+        add(writeTiFile);
         add(getFileChooser);
 
         setVisible(true);
