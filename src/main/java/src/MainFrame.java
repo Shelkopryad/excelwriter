@@ -133,10 +133,10 @@ public class MainFrame extends JFrame {
         Sheet sheet = workbook.getSheet(props.getProperty("listName"));
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
-        Cell nameCell = row.createCell(1);
-        Cell phoneCell = row.createCell(4);
-        Cell emailCell = row.createCell(5);
-        Cell uriCell = row.createCell(8);
+        Cell nameCell = row.createCell(Integer.parseInt(props.getProperty("nameInd")) - 1);
+        Cell phoneCell = row.createCell(Integer.parseInt(props.getProperty("phoneInd")) - 1);
+        Cell emailCell = row.createCell(Integer.parseInt(props.getProperty("emailInd")) - 1);
+        Cell uriCell = row.createCell(Integer.parseInt(props.getProperty("uriInd")) - 1);
 
         String uri = uriField.getText();
         String name = restHelper.getValue(props.getProperty("name"));
