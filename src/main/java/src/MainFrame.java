@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
 
         boolean flag = pushInfo(workbook);
         if (!flag) {
-            JOptionPane.showMessageDialog(null, "Ошибка. Свяжитесь с разработчиком.");
+            JOptionPane.showMessageDialog(null, "Ошибка! Свяжитесь с разработчиком!");
             return;
         }
 
@@ -140,7 +140,8 @@ public class MainFrame extends JFrame {
         int rowCount = sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(rowCount);
 
-        if (props.getProperty("nameInd") == null || props.getProperty("phoneInd") == null || props.getProperty("emailInd") == null || props.getProperty("uriInd") == null) {
+        if (props.getProperty("nameInd") == null || props.getProperty("phoneInd") == null
+                || props.getProperty("emailInd") == null || props.getProperty("uriInd") == null) {
             return false;
         }
 
