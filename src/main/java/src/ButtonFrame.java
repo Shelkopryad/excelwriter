@@ -21,7 +21,7 @@ public class ButtonFrame extends JFrame {
 
     private RestHelper restHelper;
     private File file = null;
-    private JTextField name, uri, email, phone;
+    private JTextField nameField, uriField, emailField, phoneField, tokenField;
 
     public ButtonFrame() {
         super("Personal Jesus");
@@ -32,89 +32,77 @@ public class ButtonFrame extends JFrame {
     private void constuctGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        setSize(440, 180);
+        setSize(440, 205);
         setResizable(false);
         setLocationByPlatform(true);
         setAlwaysOnTop(true);
 
+        JLabel tokenLbl = new JLabel("Token");
         JLabel uriLbl = new JLabel("URL");
         JLabel nameLbl = new JLabel("Название");
         JLabel phoneLbl = new JLabel("Телефон");
         JLabel emailLbl = new JLabel("Email");
-        uri = new JTextField(40);
-        name = new JTextField(40);
-        phone = new JTextField(40);
-        email = new JTextField(40);
 
+        tokenField = new JTextField(40);
+        uriField = new JTextField(40);
+        nameField = new JTextField(40);
+        phoneField = new JTextField(40);
+        emailField = new JTextField(40);
+
+        tokenLbl.setSize(60, 20);
+        tokenLbl.setLocation(10, 10);
         uriLbl.setSize(60, 20);
-        uriLbl.setLocation(10, 10);
+        uriLbl.setLocation(10, 35);
         nameLbl.setSize(60, 20);
-        nameLbl.setLocation(10, 35);
+        nameLbl.setLocation(10, 60);
         phoneLbl.setSize(60, 20);
-        phoneLbl.setLocation(10, 60);
+        phoneLbl.setLocation(10, 85);
         emailLbl.setSize(60, 20);
-        emailLbl.setLocation(10, 85);
+        emailLbl.setLocation(10, 110);
 
-        uri.setSize(350, 20);
-        uri.setLocation(70, 10);
-        name.setSize(350, 20);
-        name.setLocation(70, 35);
-        phone.setSize(350, 20);
-        phone.setLocation(70, 60);
-        email.setSize(350, 20);
-        email.setLocation(70, 85);
+        tokenField.setSize(350, 20);
+        tokenField.setLocation(70, 10);
+        uriField.setSize(350, 20);
+        uriField.setLocation(70, 35);
+        nameField.setSize(350, 20);
+        nameField.setLocation(70, 60);
+        phoneField.setSize(350, 20);
+        phoneField.setLocation(70, 85);
+        emailField.setSize(350, 20);
+        emailField.setLocation(70, 110);
 
         JButton save = new JButton("Write");
         JButton getFileChooser = new JButton("Choose file");
         save.addActionListener(new CopyListener());
         getFileChooser.addActionListener(new FileChooserListener());
         save.setSize(100, 30);
-        save.setLocation(210, 110);
+        save.setLocation(210, 140);
         getFileChooser.setSize(100, 30);
-        getFileChooser.setLocation(315, 110);
+        getFileChooser.setLocation(315, 140);
 
+        add(tokenLbl);
+        add(tokenField);
         add(nameLbl);
-        add(name);
+        add(nameField);
         add(phoneLbl);
-        add(phone);
+        add(phoneField);
         add(emailLbl);
-        add(email);
+        add(emailField);
         add(uriLbl);
-        add(uri);
+        add(uriField);
         add(save);
         add(getFileChooser);
 
         setVisible(true);
     }
 
-    private void writeFile(Response response) throws IOException {
+    private void writeFile() throws IOException {
         Workbook workbook = getWorkbook();
         if (workbook == null) {
             JOptionPane.showMessageDialog(null, "Не выбран файл!");
             return;
         }
-        Sheet sheet = workbook.getSheet("list");
-        int rowCount = sheet.getLastRowNum() + 1;
-        Row row = sheet.createRow(rowCount);
-        Cell nameCell = row.createCell(1);
-        Cell phoneCell = row.createCell(3);
-        Cell emailCell = row.createCell(4);
-        Cell uriCell = row.createCell(6);
-
-        String uriS = uri.getText();
-        String nameS = restHelper.getValue("applicant.shortName");
-        String phoneS = restHelper.getValue("applicant.contacts[0].value");
-        String emailS = restHelper.getValue("applicant.contacts[1].value");
-
-        name.setText(nameS);
-        phone.setText(phoneS);
-        email.setText(emailS);
-
-        nameCell.setCellValue(nameS);
-        phoneCell.setCellValue(phoneS);
-        emailCell.setCellValue(emailS);
-        uriCell.setCellValue(uriS);
-
+        pushInfo(workbook);
         try (BufferedOutputStream fio = new BufferedOutputStream(new FileOutputStream(file))) {
             workbook.write(fio);
         }
@@ -143,17 +131,45 @@ public class ButtonFrame extends JFrame {
         return workbook;
     }
 
+    private void pushInfo(Workbook workbook) {
+        Sheet sheet = workbook.getSheet("list");
+        int rowCount = sheet.getLastRowNum() + 1;
+        Row row = sheet.createRow(rowCount);
+        Cell nameCell = row.createCell(1);
+        Cell phoneCell = row.createCell(4);
+        Cell emailCell = row.createCell(5);
+        Cell uriCell = row.createCell(8);
+
+        String uri = uriField.getText();
+        String name = restHelper.getValue("applicant.shortName");
+        String phone = restHelper.getValue("applicant.contacts[0].value");
+        String email = restHelper.getValue("applicant.contacts[1].value");
+
+        nameField.setText(name);
+        phoneField.setText(phone);
+        emailField.setText(email);
+
+        nameCell.setCellValue(name);
+        phoneCell.setCellValue(phone);
+        emailCell.setCellValue(email);
+        uriCell.setCellValue(uri);
+    }
+
     private class CopyListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            String baseUri = uri.getText();
-            Response response = restHelper.getResponse(baseUri);
+            String token = tokenField.getText();
+            String baseUri = uriField.getText();
+            Response response = restHelper.getResponse(baseUri, token);
+
+            System.out.println(baseUri + " - " + token);
+            response.prettyPrint();
 
             try {
-                writeFile(response);
+                writeFile();
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Какая-то ошибка!");
+                JOptionPane.showMessageDialog(null, "Какая-то ошибка! Наши эксперты уже разбираются!");
             }
         }
     }
