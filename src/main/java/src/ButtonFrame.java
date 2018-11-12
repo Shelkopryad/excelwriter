@@ -1,6 +1,5 @@
 package src;
 
-import io.restassured.response.Response;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,6 +25,7 @@ public class ButtonFrame extends JFrame {
     public ButtonFrame() {
         super("Personal Jesus");
         constuctGUI();
+        loadProperties();
         restHelper = RestHelper.getInstance();
     }
 
@@ -71,10 +71,14 @@ public class ButtonFrame extends JFrame {
         emailField.setSize(350, 20);
         emailField.setLocation(70, 110);
 
+        JButton saveProperties = new JButton("Save token");
         JButton save = new JButton("Write");
         JButton getFileChooser = new JButton("Choose file");
+        saveProperties.addActionListener(new SaveTokenListaner());
         save.addActionListener(new CopyListener());
         getFileChooser.addActionListener(new FileChooserListener());
+        saveProperties.setSize(100, 30);
+        saveProperties.setLocation(105, 140);
         save.setSize(100, 30);
         save.setLocation(210, 140);
         getFileChooser.setSize(100, 30);
@@ -90,6 +94,7 @@ public class ButtonFrame extends JFrame {
         add(emailField);
         add(uriLbl);
         add(uriField);
+        add(saveProperties);
         add(save);
         add(getFileChooser);
 
@@ -155,16 +160,27 @@ public class ButtonFrame extends JFrame {
         uriCell.setCellValue(uri);
     }
 
+    private void loadProperties() {
+        String token = Props.getInstance().getProperty("token");
+        tokenField.setText(token);
+    }
+
+    private class SaveTokenListaner implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            String token = tokenField.getText();
+            Props.getInstance().setProperty("token", token);
+        }
+    }
+
     private class CopyListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             String token = tokenField.getText();
             String baseUri = uriField.getText();
-            Response response = restHelper.getResponse(baseUri, token);
-
-            System.out.println(baseUri + " - " + token);
-            response.prettyPrint();
+            restHelper.getResponse(baseUri, token);
 
             try {
                 writeFile();
