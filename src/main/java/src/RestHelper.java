@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Shelk on 08.11.2018.
+ * Created by Shelkopryad on 08.11.2018.
  */
 public class RestHelper {
 

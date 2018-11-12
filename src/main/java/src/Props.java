@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * Created by 16734975 on 12.11.2018.
+ * Created by Shelkopryad on 12.11.2018.
  */
 public class Props {
 

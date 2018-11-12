@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by 16734975 on 12.11.2018.
+ * Created by Shelkopryad on 12.11.2018.
  */
 public class Settings extends JFrame {
 
